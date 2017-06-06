@@ -4,7 +4,8 @@ from __future__ import print_function
 from copy import deepcopy
 import sys
 
-## Helper functions
+# Helper functions
+
 
 # Translate a position in chess notation to x,y-coordinates
 # Example: c3 corresponds to (2,5)
@@ -12,6 +13,7 @@ def to_coordinate(notation):
     x = ord(notation[0]) - ord('a')
     y = 8 - int(notation[1])
     return (x, y)
+
 
 # Translate a position in x,y-coordinates to chess notation
 # Example: (2,5) corresponds to c3
@@ -21,12 +23,14 @@ def to_notation(coordinates):
     number = 8 - y
     return letter + str(number)
 
+
 # Translates two x,y-coordinates into a chess move notation
 # Example: (1,4) and (2,3) will become b4c5
 def to_move(from_coord, to_coord):
     return to_notation(from_coord) + to_notation(to_coord)
 
-## Defining board states
+
+# Defining board states
 
 # These Static classes are used as enums for:
 # - Material.Rook
@@ -36,8 +40,11 @@ def to_move(from_coord, to_coord):
 # - Side.Black
 class Material:
     Rook, King, Pawn = ['r', 'k', 'p']
+
+
 class Side:
     White, Black = range(0,2)
+
 
 # A chesspiece on the board is specified by the side it belongs to and the type
 # of the chesspiece
@@ -57,8 +64,7 @@ class ChessBoard:
         self.turn = turn
         self.board_matrix = None
 
-
-    ## Getter and setter methods 
+    # Getter and setter methods
     def set_board_matrix(self,board_matrix):
         self.board_matrix = board_matrix
 
@@ -288,7 +294,6 @@ class ChessComputer:
         else:
             return ChessComputer.minimax(chessboard, depth)
 
-
     # This function uses minimax to calculate the next move. Given the current
     # chessboard and max depth, this function should return a tuple of the
     # the score and the move that should be executed
@@ -315,6 +320,7 @@ class ChessComputer:
     @staticmethod
     def evaluate_board(chessboard, depth_left):
         return 0
+
 
 # This class is responsible for starting the chess game, playing and user 
 # feedback
@@ -357,12 +363,10 @@ class ChessGame:
             print("")
             self.make_human_move()
 
-
     def make_computer_move(self):
         print("Calculating best move...")
         return ChessComputer.computer_move(self.chessboard,
                 self.depth, alphabeta=True)
-        
 
     def make_human_move(self):
         # Endlessly request input until the right input is specified
