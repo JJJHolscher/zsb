@@ -1,5 +1,5 @@
 # Door Jochem en Reitze
-
+# test
 from __future__ import print_function
 from copy import deepcopy
 import sys
@@ -45,6 +45,7 @@ class Piece:
     def __init__(self, side, material):
         self.side = side
         self.material = material
+
 
 
 # A chess configuration is specified by whose turn it is and a 2d array
@@ -170,14 +171,103 @@ class ChessBoard:
     # [c2c3, d4e5, f4f8]
     # TODO: write an implementation for this function
     def legal_moves(self):
+        moves_list = []
+        piece_locs = self.get_own_pieces()
+        for loc in piece_locs:
+            piece = self.get_boardpiece(loc)
+            if piece.material == Material.King:
+                moves_list.extend(self.moves_king(loc))
+                continue
+            if piece.material == Material.Pawn:
+                moves_list.extend(self.moves_pawn(loc))
+                continue
+            if piece.material == Material.Rook:
+                moves_list.extend(self.moves_rook(loc))
+                continue
+        return moves_list
+
+
+    # returns a list of all move strings for a king at location loc
+    # i.e [h5h6, h5g6, h5g5, h5g4, h5h4] (king is o the side of the board)
+    def moves_king(self, loc):
+        moves = []
+        x_dimension = [-1, 0, 1]
+        y_dimension = [-1, 0, 1]
+        for dx in x_dimension:
+            for dy in y_dimension:
+                moves.extend(self.explore_line(loc, dx, dx, one=True))
+        for move in range(len(moves)-1):
+            if move == to_move(loc,loc):
+                del moves[moves.index(move)]
+        return moves
+
+    # returns a list of all move strings for a pawn at location loc
+    # i.e. [a1a2, b1b2, c3b4]
+    # this should be dependand whose turn it is.
+    def moves_pawn(self, loc):
         pass
+
+    # returns a list of all move strings for a rook at location loc
+    # i.e. [a1a3, a2f2, ...]
+    def moves_rook(self, loc):
+        moves = []
+        x_dimension = [-1, 1]
+        for dx in x_dimension:
+            moves.extend(self.explore_line(loc, dx, 0))
+        y_dimension = [-1, 1]
+        for dy in y_dimension:
+            moves.extend(self.explore_line(loc, 0, dy))
+        return moves
+
+    # returns all move strings from a location by incrementing with dx and dy
+    # untill the board edge, a friendly unit or an enemy unit is reached
+    # one=True will cause only one increment to happen and is thus usefull for
+    # kings, knights (in the future) & pawns
+    def explore_line(self, loc, dx, dy, one=False):
+        (newx, newy) = loc
+        moves = []
+        while newx > -1 and newx < 8 and newy > -1 and newy < 8 and one == False:
+            (newx, newy) = (newx+dx, newy+dy)
+            piece = self.get_boardpiece((newx, newy))
+            if piece == None:
+                moves.append(to_move(loc, (newx, newy)))
+                continue
+            if piece.side == self.turn:
+                break
+            if piece.side != self.turn:
+                moves.append(to_move(loc, (newx, newy)))
+                break
+        (newx, newy) = (newx + dx, newy + dy)
+        if newx > -1 and newx < 8 and newy > -1 and newy < 8 and one == True:
+            piece = self.get_boardpiece((newx, newy))
+            if piece == None:
+                moves.append(to_move(loc, (newx, newy)))
+            elif piece.side == self.turn:
+                pass
+            elif piece.side != self.turn:
+                moves.append(to_move(loc, (newx, newy)))
+        return moves
+
+
+    def get_own_pieces(self):
+        pos_w_piece = []
+        for x in range(8):
+            for y in range(8):
+                piece = self.get_boardpiece((x,y))
+                if piece.side == self.turn:
+                    pos_w_piece.append((x,y))
+        return pos_w_piece
+
 
     # This function should return, given the move specified (in the format
     # 'd2d3') whether this move is legal
     # TODO: write an implementation for this function, implement it in terms
     # of legal_moves()
     def is_legal_move(self, move):
-        return True
+        if move in self.legal_moves():
+            return True
+        else:
+            return False
 
 
 # This static class is responsible for providing functions that can calculate
