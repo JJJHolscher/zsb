@@ -3,6 +3,7 @@
 from __future__ import print_function
 from copy import deepcopy
 import sys
+import math
 
 # Helper functions
 
@@ -39,7 +40,7 @@ def to_move(from_coord, to_coord):
 # - Side.White
 # - Side.Black
 class Material:
-    Rook, King, Pawn = ['r', 'k', 'p']
+    Bisshop, Knight, Pawn, Queen, Rook, King = ['b', 'n', 'p', 'q', 'r', 'k']
 
 
 class Side:
@@ -52,7 +53,18 @@ class Piece:
     def __init__(self, side, material):
         self.side = side
         self.material = material
-
+        if self.material == 'b':
+            self.worth = 3
+        elif self.material == 'n':
+            self.worth = 3
+        elif self.material == 'p':
+            self.worth = 1
+        elif self.material == 'q':
+            self.worth = 9
+        elif self.material == 'r':
+            self.worth = 5
+        elif self.material == 'k':
+            self.worth = 200
 
 # A chess configuration is specified by whose turn it is and a 2d array
 # with all the pieces on the board
@@ -185,6 +197,12 @@ class ChessBoard:
                 moves_list.extend(self.moves_pawn(loc))
             elif piece.material == Material.Rook:
                 moves_list.extend(self.moves_rook(loc))
+            elif piece.material == Material.Bisshop:
+                moves_list.extend(self.moves_bisshop(loc))
+            elif piece.material == Material.Knight:
+                moves_list.extend(self.moves_knight(loc))
+            elif piece.material == Material.Queen:
+                moves_list.extend(self.moves_queen(loc))
         return moves_list
 
     # returns a list of all move strings for a king at location loc
@@ -230,6 +248,37 @@ class ChessBoard:
         y_dimension = [-1, 1]
         for dy in y_dimension:
             moves.extend(self.explore_line(loc, 0, dy))
+        return moves
+
+    def moves_queen(self, loc):
+        moves = []
+        x_dimension = [-1,0,1]
+        y_dimension = [-1,0,1]
+        for dx in x_dimension:
+            for dy in y_dimension:
+                if dx == dy == 0:
+                    continue
+                moves.extend(self.explore_line(loc, dx, dy))
+        return moves
+
+    def moves_bisshop(self, loc):
+        moves = []
+        x_dimension = [-1,1]
+        y_dimension = [-1,1]
+        for dx in x_dimension:
+            for dy in y_dimension:
+                moves.extend(self.explore_line(loc, dx, dy))
+        return moves
+
+    def moves_knight(self, loc):
+        moves = []
+        x_dimension = [-2, -1, 1, 2]
+        y_dimension = [-2, -1, 1, 2]
+        for dx in x_dimension:
+            for dy in y_dimension:
+                if abs(dx) == abs(dy):
+                    continue
+                moves.extend(self.explore_line(loc, dx, dy, one=True))
         return moves
 
     # returns all move strings from a location by incrementing with dx and dy
@@ -368,7 +417,17 @@ class ChessComputer:
     # means white is better off, while negative means black is better of
     @staticmethod
     def evaluate_board(chessboard, depth_left):
-        return 0
+        score = 0
+        for x in range(8):
+            for y in range(8):
+                piece = chessboard.get_boardpiece((x,y))
+                if piece and not piece.side:
+                    score += piece.worth
+                if piece and piece.side:
+                    score -= piece.worth
+        score *= math.log(depth_left)
+        return score
+
 
 
 # This class is responsible for starting the chess game, playing and user 
