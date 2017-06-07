@@ -43,7 +43,7 @@ class Material:
 
 
 class Side:
-    White, Black = range(0,2)
+    White, Black = range(0, 2)
 
 
 # A chesspiece on the board is specified by the side it belongs to and the type
@@ -52,7 +52,6 @@ class Piece:
     def __init__(self, side, material):
         self.side = side
         self.material = material
-
 
 
 # A chess configuration is specified by whose turn it is and a 2d array
@@ -65,21 +64,21 @@ class ChessBoard:
         self.board_matrix = None
 
     # Getter and setter methods
-    def set_board_matrix(self,board_matrix):
+    def set_board_matrix(self, board_matrix):
         self.board_matrix = board_matrix
 
     # Note: assumes the position is valid
-    def get_boardpiece(self,position):
+    def get_boardpiece(self, position):
         (x,y) = position
         return self.board_matrix[y][x]
 
     # Note: assumes the position is valid
-    def set_boardpiece(self,position,piece):
+    def set_boardpiece(self, position, piece):
         (x,y) = position
         self.board_matrix[y][x] = piece
     
     # Read in the board_matrix using an input string
-    def load_from_input(self,input_str):
+    def load_from_input(self, input_str):
         self.board_matrix = [[None for _ in range(8)] for _ in range(8)]
         x = 0
         y = 0
@@ -175,7 +174,6 @@ class ChessBoard:
     # which players turn it is, all the moves possible for that player
     # It should return these moves as a list of move strings, e.g.
     # [c2c3, d4e5, f4f8]
-    # TODO: write an implementation for this function
     def legal_moves(self):
         moves_list = []
         piece_locs = self.get_own_pieces()
@@ -183,15 +181,11 @@ class ChessBoard:
             piece = self.get_boardpiece(loc)
             if piece.material == Material.King:
                 moves_list.extend(self.moves_king(loc))
-                continue
-            if piece.material == Material.Pawn:
+            elif piece.material == Material.Pawn:
                 moves_list.extend(self.moves_pawn(loc))
-                continue
-            if piece.material == Material.Rook:
+            elif piece.material == Material.Rook:
                 moves_list.extend(self.moves_rook(loc))
-                continue
         return moves_list
-
 
     # returns a list of all move strings for a king at location loc
     # i.e [h5h6, h5g6, h5g5, h5g4, h5h4] (king is o the side of the board)
@@ -201,7 +195,7 @@ class ChessBoard:
         y_dimension = [-1, 0, 1]
         for dx in x_dimension:
             for dy in y_dimension:
-                moves.extend(self.explore_line(loc, dx, dx, one=True))
+                moves.extend(self.explore_line(loc, dx, dy, one=True))
         for move in range(len(moves)-1):
             if move == to_move(loc,loc):
                 del moves[moves.index(move)]
@@ -211,7 +205,20 @@ class ChessBoard:
     # i.e. [a1a2, b1b2, c3b4]
     # this should be dependand whose turn it is.
     def moves_pawn(self, loc):
-        pass
+        dy = 0
+        if self.turn == Side.White:
+            dy = -1
+        else:
+            dy = 1
+
+        moves = [to_move(loc, (loc[0], loc[1] + dy))]
+        x_dimension = [-1, 1]
+        for dx in x_dimension:
+            new_loc = (loc[0] + dx, loc[1] + dy)
+            if self.get_boardpiece(new_loc):
+                moves.extend(to_move(loc, new_loc))
+
+        return moves
 
     # returns a list of all move strings for a rook at location loc
     # i.e. [a1a3, a2f2, ...]
@@ -230,21 +237,21 @@ class ChessBoard:
     # one=True will cause only one increment to happen and is thus usefull for
     # kings, knights (in the future) & pawns
     def explore_line(self, loc, dx, dy, one=False):
-        (newx, newy) = loc
         moves = []
-        while newx > -1 and newx < 8 and newy > -1 and newy < 8 and one == False:
-            (newx, newy) = (newx+dx, newy+dy)
+        (newx, newy) = (loc[0] + dx, loc[1] + dy)
+        while -1 < newx < 8 and -1 < newy < 8 and not one:
             piece = self.get_boardpiece((newx, newy))
             if piece == None:
                 moves.append(to_move(loc, (newx, newy)))
-                continue
-            if piece.side == self.turn:
+            elif piece.side == self.turn:
                 break
-            if piece.side != self.turn:
+            elif piece.side != self.turn:
                 moves.append(to_move(loc, (newx, newy)))
                 break
-        (newx, newy) = (newx + dx, newy + dy)
-        if newx > -1 and newx < 8 and newy > -1 and newy < 8 and one == True:
+            newx += dx
+            newy += dy
+
+        if -1 < newx < 8 and -1 < newy < 8 and one:
             piece = self.get_boardpiece((newx, newy))
             if piece == None:
                 moves.append(to_move(loc, (newx, newy)))
@@ -254,20 +261,17 @@ class ChessBoard:
                 moves.append(to_move(loc, (newx, newy)))
         return moves
 
-
     def get_own_pieces(self):
         pos_w_piece = []
         for x in range(8):
             for y in range(8):
                 piece = self.get_boardpiece((x,y))
-                if piece.side == self.turn:
+                if piece and piece.side == self.turn:
                     pos_w_piece.append((x,y))
         return pos_w_piece
 
-
     # This function should return, given the move specified (in the format
     # 'd2d3') whether this move is legal
-    # TODO: write an implementation for this function, implement it in terms
     # of legal_moves()
     def is_legal_move(self, move):
         if move in self.legal_moves():
@@ -394,6 +398,6 @@ class ChessGame:
             print("Black wins!")
             sys.exit(0)
 
+
 chess_game = ChessGame(Side.White)
 chess_game.main()
-
