@@ -288,7 +288,7 @@ class ChessComputer:
     # possible. The input needed is a chessboard configuration and the max
     # depth of the search algorithm. It returns a tuple of (score, chessboard)
     # with score the maximum score attainable and chessboardmove that is needed
-    #to achieve this score.
+    # to achieve this score.
     @staticmethod
     def computer_move(chessboard, depth, alphabeta=False):
         if alphabeta:
@@ -306,7 +306,52 @@ class ChessComputer:
     # TODO: write an implementation for this function
     @staticmethod
     def minimax(chessboard, depth):
-        return (0, "no implementation written")
+        best_move = ''
+        best_score = 99999
+        enemy = Side.White
+        if chessboard.turn == Side.White:
+            enemy = Side.Black
+            best_score = -best_score
+
+        for move in chessboard.legal_moves():
+            chessboard.make_move(move)
+            score = ChessComputer.minimax_turn(chessboard, depth - 1, enemy)
+            revert_move = move[2:4] + move[0:2]
+            chessboard.make_move(revert_move)
+
+            if enemy == Side.White and score < best_score:
+                best_score = score
+                best_move = move
+            elif enemy == Side.Black and score > best_score:
+                best_score = score
+                best_move = move
+
+        return best_score, best_move
+
+    @staticmethod
+    def minimax_turn(chessboard, depth, side):
+        best_score = 99999
+        enemy = Side.White
+        if side == Side.White:
+            enemy = Side.Black
+            best_score = -best_score
+
+        if depth == 0 or chessboard.is_king_dead(enemy):
+            return ChessComputer.evaluate_board(chessboard, depth)
+
+        chessboard.turn = side
+        for move in chessboard.legal_moves():
+            chessboard.make_move(move)
+            score = ChessComputer.minimax_turn(chessboard, depth - 1, enemy)
+            revert_move = move[2:4] + move[0:2]
+            chessboard.make_move(revert_move)
+
+            if enemy == Side.White and score < best_score:
+                best_score = score
+            elif enemy == Side.Black and score > best_score:
+                best_score = score
+
+        return best_score
 
     # This function uses alphabeta to calculate the next move. Given the
     # chessboard and max depth, this function should return a tuple of the
