@@ -358,7 +358,7 @@ class ChessComputer:
         best_move = ''
         best_score = 99999
         enemy = Side.White
-        if chessboard.turn == Side.White:
+        if chessboard.turn == Side.Black:
             enemy = Side.Black
             best_score = -best_score
 
@@ -425,7 +425,7 @@ class ChessComputer:
                     score += piece.worth
                 if piece and piece.side:
                     score -= piece.worth
-        score *= math.log(depth_left)
+        score *= 1.1**depth_left
         return score
 
 
@@ -474,7 +474,7 @@ class ChessGame:
     def make_computer_move(self):
         print("Calculating best move...")
         return ChessComputer.computer_move(self.chessboard,
-                self.depth, alphabeta=True)
+                self.depth, alphabeta=False)
 
     def make_human_move(self):
         # Endlessly request input until the right input is specified
