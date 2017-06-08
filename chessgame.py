@@ -229,11 +229,14 @@ class ChessBoard:
         else:
             dy = 1
 
+        if loc[1] + dy > 7 or loc[1] + dy < 0:
+            return []
+
         moves = [to_move(loc, (loc[0], loc[1] + dy))]
         x_dimension = [-1, 1]
         for dx in x_dimension:
             new_loc = (loc[0] + dx, loc[1] + dy)
-            if self.get_boardpiece(new_loc):
+            if 0 <= new_loc[0] <= 7 and self.get_boardpiece(new_loc):
                 moves.append(to_move(loc, new_loc))
 
         return moves
