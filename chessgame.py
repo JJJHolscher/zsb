@@ -425,7 +425,8 @@ class ChessComputer:
         for move in chessboard.legal_moves():
             new_chessboard = chessboard.make_move(move)
 
-            score = ChessComputer.alphabeta_turn(new_chessboard, depth - 1, alpha, beta)
+            score = ChessComputer.alphabeta_turn(new_chessboard, depth - 1,
+                                                 alpha, beta)
             if enemy == Side.White and score < best_score:
                 best_score = score
                 best_move = move
@@ -451,7 +452,8 @@ class ChessComputer:
         for move in chessboard.legal_moves():
             new_chessboard = chessboard.make_move(move)
 
-            score = ChessComputer.alphabeta_turn(new_chessboard, depth - 1, alpha, beta)
+            score = ChessComputer.alphabeta_turn(new_chessboard, depth - 1,
+                                                 alpha, beta)
             if enemy == Side.White and score < best_score:
                 if score <= alpha:
                     return alpha
@@ -534,8 +536,8 @@ class ChessGame:
 
     def make_computer_move(self):
         print("Calculating best move...")
-        return ChessComputer.computer_move(self.chessboard,
-                self.depth, alphabeta=True)
+        return ChessComputer.computer_move(self.chessboard, self.depth,
+                                           alphabeta=True)
 
     def make_human_move(self):
         # Endlessly request input until the right input is specified
