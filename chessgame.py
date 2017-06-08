@@ -408,7 +408,28 @@ class ChessComputer:
     # of a specific board configuration after the max depth is reached
     @staticmethod
     def alphabeta(chessboard, depth, alpha, beta):
-        return (0, "no implementation written")
+        best_move = ''
+        best_score = 99999
+        enemy = Side.White
+        if chessboard.turn == Side.White:
+            enemy = Side.Black
+            best_score = -best_score
+        if depth:
+            for move in chessboard.legal_moves():
+                new_chessboard = chessboard.make_move(move)
+
+                [score, _] = ChessComputer.alphabeta(new_chessboard, depth - 1, alpha, beta)
+                if enemy == Side.White and score < best_score:
+                    best_score = score
+                    best_move = move
+                elif enemy == Side.Black and score > best_score:
+                    best_score = score
+                    best_move = move
+        else:
+            best_score = ChessComputer.evaluate_board(chessboard, depth)
+
+        return [best_score, best_move]
+
 
     # Calculates the score of a given board configuration based on the 
     # material left on the board. Returns a score number, in which positive
