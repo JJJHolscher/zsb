@@ -13,13 +13,13 @@ import math
 def to_coordinate(notation):
     x = ord(notation[0]) - ord('a')
     y = 8 - int(notation[1])
-    return (x, y)
+    return x, y
 
 
 # Translate a position in x,y-coordinates to chess notation
 # Example: (2,5) corresponds to c3
 def to_notation(coordinates):
-    (x,y) = coordinates
+    (x, y) = coordinates
     letter = chr(ord('a') + x)
     number = 8 - y
     return letter + str(number)
@@ -64,7 +64,7 @@ class Piece:
         elif self.material == 'r':
             self.worth = 5
         elif self.material == 'k':
-            self.worth = 200
+            self.worth = 100
 
 # A chess configuration is specified by whose turn it is and a 2d array
 # with all the pieces on the board
@@ -81,7 +81,7 @@ class ChessBoard:
 
     # Note: assumes the position is valid
     def get_boardpiece(self, position):
-        (x,y) = position
+        (x, y) = position
         return self.board_matrix[y][x]
 
     # Note: assumes the position is valid
@@ -176,7 +176,7 @@ class ChessBoard:
         seen_king = False
         for x in range(8):
             for y in range(8):
-                piece = self.get_boardpiece((x,y))
+                piece = self.get_boardpiece((x, y))
                 if piece != None and piece.side == side and \
                         piece.material == Material.King:
                     seen_king = True
@@ -234,7 +234,7 @@ class ChessBoard:
         for dx in x_dimension:
             new_loc = (loc[0] + dx, loc[1] + dy)
             if self.get_boardpiece(new_loc):
-                moves.extend(to_move(loc, new_loc))
+                moves.append(to_move(loc, new_loc))
 
         return moves
 
@@ -358,16 +358,14 @@ class ChessComputer:
         best_move = ''
         best_score = 99999
         enemy = Side.White
-        if chessboard.turn == Side.Black:
+        if chessboard.turn == Side.White:
             enemy = Side.Black
             best_score = -best_score
 
         for move in chessboard.legal_moves():
-            chessboard.make_move(move)
-            score = ChessComputer.minimax_turn(chessboard, depth - 1, enemy)
-            revert_move = move[2:4] + move[0:2]
-            chessboard.make_move(revert_move)
+            new_chessboard = chessboard.make_move(move)
 
+            score = ChessComputer.minimax_turn(new_chessboard, depth - 1)
             if enemy == Side.White and score < best_score:
                 best_score = score
                 best_move = move
@@ -378,23 +376,20 @@ class ChessComputer:
         return best_score, best_move
 
     @staticmethod
-    def minimax_turn(chessboard, depth, side):
+    def minimax_turn(chessboard, depth):
         best_score = 99999
         enemy = Side.White
-        if side == Side.White:
+        if chessboard.turn == Side.White:
             enemy = Side.Black
             best_score = -best_score
 
-        if depth == 0 or chessboard.is_king_dead(enemy):
+        if depth == 0 or chessboard.is_king_dead(chessboard.turn):
             return ChessComputer.evaluate_board(chessboard, depth)
 
-        chessboard.turn = side
         for move in chessboard.legal_moves():
-            chessboard.make_move(move)
-            score = ChessComputer.minimax_turn(chessboard, depth - 1, enemy)
-            revert_move = move[2:4] + move[0:2]
-            chessboard.make_move(revert_move)
+            new_chessboard = chessboard.make_move(move)
 
+            score = ChessComputer.minimax_turn(new_chessboard, depth - 1)
             if enemy == Side.White and score < best_score:
                 best_score = score
             elif enemy == Side.Black and score > best_score:
@@ -425,9 +420,10 @@ class ChessComputer:
                     score += piece.worth
                 if piece and piece.side:
                     score -= piece.worth
-        score *= 1.1**depth_left
-        return score
 
+        if depth_left:
+            score *= depth_left
+        return score
 
 
 # This class is responsible for starting the chess game, playing and user 
@@ -460,12 +456,12 @@ class ChessGame:
             print(self.chessboard)
 
             # Print the current score
-            score = ChessComputer.evaluate_board(self.chessboard,self.depth)
+            score = ChessComputer.evaluate_board(self.chessboard, 0)
             print("Current score: " + str(score))
-            
+
             # Calculate the best possible move
             new_score, best_move = self.make_computer_move()
-            
+
             print("Best move: " + best_move)
             print("Score to achieve: " + str(new_score))
             print("")
