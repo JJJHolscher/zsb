@@ -1,9 +1,12 @@
-# Door Jochem en Reitze
-# test
+# chessgame.py
+# This file will play chess with a human. The program will suggest moves. It
+# does this using one of two decision-making algorithms: minimax and alphabeta.
+# Right now it uses alphabeta.
+#
+# By Jochem (11007729) and Reitze (11045442) on 8 june 2017 from group C
+
 from __future__ import print_function
-from copy import deepcopy
 import sys
-import math
 
 # Helper functions
 
@@ -65,6 +68,7 @@ class Piece:
             self.worth = 5
         elif self.material == 'k':
             self.worth = 100
+
 
 # A chess configuration is specified by whose turn it is and a 2d array
 # with all the pieces on the board
@@ -253,6 +257,7 @@ class ChessBoard:
             moves.extend(self.explore_line(loc, 0, dy))
         return moves
 
+    # returns a list of all move strings for a queen at location loc
     def moves_queen(self, loc):
         moves = []
         x_dimension = [-1,0,1]
@@ -264,6 +269,7 @@ class ChessBoard:
                 moves.extend(self.explore_line(loc, dx, dy))
         return moves
 
+    # returns a list of all move strings for a bisshop at location loc
     def moves_bisshop(self, loc):
         moves = []
         x_dimension = [-1,1]
@@ -273,6 +279,7 @@ class ChessBoard:
                 moves.extend(self.explore_line(loc, dx, dy))
         return moves
 
+    # returns a list of all move strings for a knight at location loc
     def moves_knight(self, loc):
         moves = []
         x_dimension = [-2, -1, 1, 2]
@@ -286,7 +293,7 @@ class ChessBoard:
 
     # returns all move strings from a location by incrementing with dx and dy
     # untill the board edge, a friendly unit or an enemy unit is reached
-    # one=True will cause only one increment to happen and is thus usefull for
+    # one=True will cause only one increment to happen and is thus useful for
     # kings, knights (in the future) & pawns
     def explore_line(self, loc, dx, dy, one=False):
         moves = []
@@ -313,6 +320,7 @@ class ChessBoard:
                 moves.append(to_move(loc, (newx, newy)))
         return moves
 
+    # returns a list of all pieces of current side.
     def get_own_pieces(self):
         pos_w_piece = []
         for x in range(8):
@@ -355,7 +363,6 @@ class ChessComputer:
     # the score and the move that should be executed
     # NOTE: use ChessComputer.evaluate_board() to calculate the score
     # of a specific board configuration after the max depth is reached
-    # TODO: write an implementation for this function
     @staticmethod
     def minimax(chessboard, depth):
         best_move = ''
@@ -409,27 +416,54 @@ class ChessComputer:
     @staticmethod
     def alphabeta(chessboard, depth, alpha, beta):
         best_move = ''
-        best_score = 99999
+        best_score = beta
         enemy = Side.White
         if chessboard.turn == Side.White:
             enemy = Side.Black
-            best_score = -best_score
-        if depth:
-            for move in chessboard.legal_moves():
-                new_chessboard = chessboard.make_move(move)
+            best_score = alpha
 
-                [score, _] = ChessComputer.alphabeta(new_chessboard, depth - 1, alpha, beta)
-                if enemy == Side.White and score < best_score:
-                    best_score = score
-                    best_move = move
-                elif enemy == Side.Black and score > best_score:
-                    best_score = score
-                    best_move = move
-        else:
-            best_score = ChessComputer.evaluate_board(chessboard, depth)
+        for move in chessboard.legal_moves():
+            new_chessboard = chessboard.make_move(move)
 
-        return [best_score, best_move]
+            score = ChessComputer.alphabeta_turn(new_chessboard, depth - 1, alpha, beta)
+            if enemy == Side.White and score < best_score:
+                best_score = score
+                best_move = move
+                beta = best_score
+            elif enemy == Side.Black and score > best_score:
+                best_score = score
+                best_move = move
+                alpha = best_score
 
+        return best_score, best_move
+
+    @staticmethod
+    def alphabeta_turn(chessboard, depth, alpha, beta):
+        best_score = beta
+        enemy = Side.White
+        if chessboard.turn == Side.White:
+            enemy = Side.Black
+            best_score = alpha
+
+        if depth == 0 or chessboard.is_king_dead(chessboard.turn):
+            return ChessComputer.evaluate_board(chessboard, depth)
+
+        for move in chessboard.legal_moves():
+            new_chessboard = chessboard.make_move(move)
+
+            score = ChessComputer.alphabeta_turn(new_chessboard, depth - 1, alpha, beta)
+            if enemy == Side.White and score < best_score:
+                if score <= alpha:
+                    return alpha
+                best_score = score
+                beta = best_score
+            elif enemy == Side.Black and score > best_score:
+                if score >= beta:
+                    return beta
+                best_score = score
+                alpha = best_score
+
+        return best_score
 
     # Calculates the score of a given board configuration based on the 
     # material left on the board. Returns a score number, in which positive
@@ -457,7 +491,7 @@ class ChessGame:
      
         # NOTE: you can make this depth higher once you have implemented
         # alpha-beta, which is more efficient
-        self.depth = 4
+        self.depth = 6
         self.chessboard = ChessBoard(turn)
 
         # If a file was specified as commandline argument, use that filename
@@ -486,15 +520,22 @@ class ChessGame:
             # Calculate the best possible move
             new_score, best_move = self.make_computer_move()
 
+            if best_move == '':  # Recognise a tie.
+                break
+
             print("Best move: " + best_move)
             print("Score to achieve: " + str(new_score))
             print("")
             self.make_human_move()
 
+        print('No further moves possible.')
+        print('The game is a tie.')
+        sys.exit(0)
+
     def make_computer_move(self):
         print("Calculating best move...")
         return ChessComputer.computer_move(self.chessboard,
-                self.depth, alphabeta=False)
+                self.depth, alphabeta=True)
 
     def make_human_move(self):
         # Endlessly request input until the right input is specified
