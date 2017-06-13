@@ -31,9 +31,9 @@ class UMI_parameters:
         # SHOULDER, ELBOW, AND WRIST
         self.joint_ranges = {
             "Riser"     : [0.0, 0.925],
-            "Shoulder"  : [-0.09, 0.09],
-            "Elbow"     : [-0.18, 0.11],
-            "Wrist"     : [-0.11, 0.11],
+            "Shoulder"  : [-90, 90],
+            "Elbow"     : [-180, 110],
+            "Wrist"     : [-110, 110],
             "Gripper"   : [0, 0.05]
         }
 
