@@ -7,6 +7,7 @@ from visual.controls import *
 
 from umi_common import *
 
+
 class UMI_chessboard:
     def __init__(self, frameworld, board_size=0.3, position_x_z = (0.15, -0.15), angle_degrees=0):
         # Dimensions of the board

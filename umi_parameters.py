@@ -6,20 +6,20 @@ class UMI_parameters:
     def __init__(self):
         # Specifications of UMI
         # Zed
-        self.hpedestal = 0 # ???? in meters
-        self.pedestal_offset = 0 # ???? in meters
+        self.hpedestal = 1.082 # ???? in meters
+        self.pedestal_offset = 0.0675 # ???? in meters
         self.wpedestal = 0.1 # just leave it 0.1
 
         # Dimensions upper arm
-        self.upper_length = 0 # ???? in meters
-        self.upper_height = 0 # ???? in meters
+        self.upper_length = 0.2535 # ???? in meters
+        self.upper_height = 0.095 # ???? in meters
 
         # Dimensions lower arm
-        self.lower_length = 0 # ???? in meters
-        self.lower_height = 0 # ???? in meters
+        self.lower_length = 0.2535 # ???? in meters
+        self.lower_height = 0.08 # ???? in meters
 
         # Dimensions wrist
-        self.wrist_height = 0 # ???? in meters
+        self.wrist_height = 0.09 # ???? in meters
 
         # Height of the arm from the very top of the riser, to the tip of the gripper.
         self.total_arm_height = self.pedestal_offset + self.upper_height \
