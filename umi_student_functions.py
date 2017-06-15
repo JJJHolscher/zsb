@@ -29,6 +29,12 @@ def apply_inverse_kinematics(x, y, z, gripper):
     # Compute the resulting angles for each joint in DEGREES (you can use the degrees() function to convert radians).
     elbow_angle = 0 # ????
     shoulder_angle = 0 # ????
+    c = (math.pow(x, 2) + math.pow(y, 2) -
+         math.pow(UMI.upper_length, 2) - math.pow(UMI.lower_length, 2))
+
+    elbow_angle = math.atan2(y, x) - \
+                  math.atan2(UMI.upper_length * )
+
     # We want the piece to be placed down in the same angle as we picked it up
     wrist_angle = 0 # ????
     # Gripper is not influenced by the kinematics, so one less variable for you to alter *yay*

@@ -32,17 +32,17 @@ class UMI_chessboard:
 
         # Set the frame of the chessboard.
         self.framemp = frame(frame=frameworld)
-        self.framemp.pos =(0, self.mplhght,0)
+        self.framemp.pos = (0, self.mplhght, 0)
 
         # Heights of the pieces:
-        self.pieces_height = {"Pawn" : 0.05, "King" : 0.07, "Rook" : 0.06}
+        self.pieces_height = {"Pawn": 0.05, "King": 0.07, "Rook": 0.06}
         # Create the board on screen
         self.generate_board()
 
         # Add the pieces
         self.add_pieces()
 
-        # Set the angle and position of the board, where the rotational axis is H8
+        # Set the angle and position of the board, the rotational axis is H8
         self.set_pos_angle(position_x_z, angle_degrees)
 
 
