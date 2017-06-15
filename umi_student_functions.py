@@ -19,26 +19,19 @@ def apply_inverse_kinematics(x, y, z, gripper):
 
         :return: Returns the a tuple containing the position and angles of the robot-arm joints.
     '''
-    # Implementation is based on the Robotics readers made by Leo.
-    # TIP: If you want to know at all times, what the current x,y,z of your robot-arm is,
-    # Read the other TIP at the bottom of the umi_simulation file.
-    
-    # Real arm runs from of 0 to 1.082
-    riser_position = y + UMI.total_arm_height # (we want the gripper to be at the y position, but we can only influence the riser.)
+    c = degrees((math.pow(x, 2) + math.pow(z, 2) -
+                math.pow(UMI.upper_length, 2) - math.pow(UMI.lower_length, 2))
+                / (2 * UMI.upper_length * UMI.lower_length))
+    s = degrees(math.sqrt(1 - math.pow(c, 2)))
 
-    # Compute the resulting angles for each joint in DEGREES (you can use the degrees() function to convert radians).
-    elbow_angle = 0 # ????
-    shoulder_angle = 0 # ????
-    c = (math.pow(x, 2) + math.pow(y, 2) -
-         math.pow(UMI.upper_length, 2) - math.pow(UMI.lower_length, 2))
+    riser_position = y + UMI.total_arm_height
+    elbow_angle = degrees(math.atan2(s, c))
+    shoulder_angle = degrees(math.atan2(z, x) -
+                     math.atan2(UMI.lower_length * s,
+                                UMI.upper_length + UMI.lower_length * c))
+    wrist_angle = -(elbow_angle + shoulder_angle)
 
-    elbow_angle = math.atan2(y, x) - \
-                  math.atan2(UMI.upper_length * )
-
-    # We want the piece to be placed down in the same angle as we picked it up
-    wrist_angle = 0 # ????
-    # Gripper is not influenced by the kinematics, so one less variable for you to alter *yay*
-    return (riser_position, shoulder_angle, elbow_angle, wrist_angle, gripper)
+    return riser_position, shoulder_angle, elbow_angle, wrist_angle, gripper
 
 def board_position_to_cartesian(chessboard, position):
     ''' Convert a position between [a1-h8] to its cartesian coordinates in frameworld coordinates.
