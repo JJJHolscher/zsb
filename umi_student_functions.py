@@ -55,7 +55,7 @@ def board_position_to_cartesian(chessboard, position):
 
     world_x = chessboard.board_size - chessboard.field_size * row
     world_y = chessboard.mplhght
-    world_z = chessboard.field_size * column
+    world_z = 0.5 * chessboard.board_size - chessboard.field_size * column
     # h8 is closes to the rotation point, row a[1-8] is furthest away from the robot arm.
 
     print(row, column)
