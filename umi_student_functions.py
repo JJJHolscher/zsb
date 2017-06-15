@@ -20,10 +20,10 @@ def apply_inverse_kinematics(x, y, z, gripper):
 
         :return: Returns the a tuple containing the position and angles of the robot-arm joints.
     '''
-    c = degrees((math.pow(x, 2) + math.pow(z, 2) -
+    c = ((math.pow(x, 2) + math.pow(z, 2) -
                 math.pow(UMI.upper_length, 2) - math.pow(UMI.lower_length, 2))
                 / (2 * UMI.upper_length * UMI.lower_length))
-    s = degrees(math.sqrt(1 - math.pow(c, 2)))
+    s = math.sqrt(1 - math.pow(c, 2))
 
     riser_position = y + UMI.total_arm_height
     elbow_angle = degrees(math.atan2(s, c))
@@ -31,6 +31,10 @@ def apply_inverse_kinematics(x, y, z, gripper):
                      math.atan2(UMI.lower_length * s,
                                 UMI.upper_length + UMI.lower_length * c))
     wrist_angle = -(elbow_angle + shoulder_angle)
+
+    print(x, y, z)
+    print(shoulder_angle, elbow_angle)
+    print()
 
     return riser_position, shoulder_angle, elbow_angle, wrist_angle, gripper
 
@@ -49,12 +53,13 @@ def board_position_to_cartesian(chessboard, position):
     # Get the local coordinates for the tiles on the board in the 0-7 range.
     (row, column) = to_coordinate(position)
 
-    world_x = chessboard.field_size * row * math.sin(chessboard.get_angle_radians())
+    world_x = chessboard.board_size - chessboard.field_size * row
     world_y = chessboard.mplhght
-    world_z = chessboard.field_size * column * math.cos(chessboard.get_angle_radians())
+    world_z = chessboard.field_size * column
     # h8 is closes to the rotation point, row a[1-8] is furthest away from the robot arm.
 
-    # ????? Perform the calculations, also take a rotation and translation of the chessboard in account!
+    print(row, column)
+    print(world_x, world_z)
 
     return world_x, world_y, world_z
 
