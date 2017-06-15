@@ -11,6 +11,7 @@ from visual import *
 # <<<<<<<<<<-------------------------------------------------------------------- TODO FOR STUDENTS
 UMI = UMI_parameters()
 
+
 def apply_inverse_kinematics(x, y, z, gripper):
     ''' Computes the angles, given some real world coordinates
         :param float x: cartesian x-coordinate
@@ -33,6 +34,7 @@ def apply_inverse_kinematics(x, y, z, gripper):
 
     return riser_position, shoulder_angle, elbow_angle, wrist_angle, gripper
 
+
 def board_position_to_cartesian(chessboard, position):
     ''' Convert a position between [a1-h8] to its cartesian coordinates in frameworld coordinates.
 
@@ -47,14 +49,15 @@ def board_position_to_cartesian(chessboard, position):
     # Get the local coordinates for the tiles on the board in the 0-7 range.
     (row, column) = to_coordinate(position)
 
+    world_x = chessboard.field_size * row * math.sin(chessboard.get_angle_radians())
+    world_y = chessboard.mplhght
+    world_z = chessboard.field_size * column * math.cos(chessboard.get_angle_radians())
     # h8 is closes to the rotation point, row a[1-8] is furthest away from the robot arm.
 
     # ????? Perform the calculations, also take a rotation and translation of the chessboard in account!
 
-    # Output the results.
-    result = (world_coordinate_x, world_coordinate_y, world_coordinate_z)
+    return world_x, world_y, world_z
 
-    return result
 
 def high_path(chessboard, from_pos, to_pos):
     '''
@@ -105,6 +108,7 @@ def high_path(chessboard, from_pos, to_pos):
     # Move to new position on SAFE height (And open the gripper)
 
     return sequence_list
+
 
 def move_to_garbage(chessboard, from_pos):
     '''
