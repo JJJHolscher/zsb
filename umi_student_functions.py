@@ -75,7 +75,7 @@ def high_path(chessboard, from_pos, to_pos):
 
     # Define half_piece height (you want to grab the middle of a piece, so get the height of the piece on a position.)
     # (*cough* this data might be stored in a chessboard *cough*)
-    piece = chessboard.pieces[from_pos]
+    piece = chessboard.pieces[from_pos][0]
 
     # You might need if statements around this, but you have to fill this variable regardlessly.
     half_piece_height = 0.5*piece.height # ????
