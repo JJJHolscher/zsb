@@ -1,4 +1,5 @@
 #!python2
+# By Jochem and Reitze (110007729 and 00000000) from group C on 6-16-17.
 
 from __future__ import division, print_function
 
