@@ -46,9 +46,9 @@ def moveShoulder(value):
     :param value: Angle in radians.
     '''
     s1_label.SetLabel('Set Shoulder rotation: %.2f degrees' % degrees(value))
-    shoulder_joint.axis = (cos(value),0,sin(value))
+    shoulder_joint.axis = (cos(value), 0, sin(value))
     UMI_angles[1] = value
-    s1.SetValue(value*1000.0)
+    s1.SetValue(value * 1000.0)
 
 def setElbowAngle(evt): # called on slider events (output in degrees)
     value = s2.GetValue() / 1000.0
@@ -60,7 +60,7 @@ def moveElbow(value):
     :param value: Angle in radians.
     '''
     s2_label.SetLabel('Set Elbow rotation: %.2f degrees' % degrees(value))
-    elbow_joint.axis = (cos(value),0,sin(value))
+    elbow_joint.axis = (cos(value), 0, sin(value))
     UMI_angles[2] = value
     s2.SetValue(value*1000.0)
 
@@ -74,9 +74,9 @@ def moveWrist(value):
     :param value: Angle in radians.
     '''
     s3_label.SetLabel('Set Wrist rotation: %.2f degrees' % degrees(value))
-    wrist_joint.axis = (cos(value),0,sin(value))
+    wrist_joint.axis = (cos(value), 0, sin(value))
     UMI_angles[3] = value
-    s3.SetValue(value*1000.0)
+    s3.SetValue(value * 1000.0)
 
 def setGripperWidth(evt): # called on slider events] (output in degrees)
     value = s4.GetValue() / 1000.0
@@ -91,7 +91,7 @@ def moveGripper(value):
     gripper_pos.pos = (0, gripper_pos.pos.y, 0.5*gripper_pos.width+value/2)
     gripper_neg.pos = (0, gripper_pos.pos.y, -0.5*gripper_pos.width-value/2)
     UMI_angles[4] = value
-    s4.SetValue(value*1000.0)
+    s4.SetValue(value * 1000.0)
 
 def read_input_file(evt):
     """
@@ -249,7 +249,7 @@ floor.pos = (floor.length/2 - UMI.wpedestal, 0, 0)
 # CHESSBOARD
 # frame, board_size=0.3, position_x_z = (0.15, -0.15), angle_degrees=0)
 # <<<<<<<<<<-------------------------------------------------------------------- CHANGE BOARD POSITION/ANGLE HERE
-CHESSBOARD = UMI_chessboard(frameworld, 0.3, (0.5, 0), 0)
+CHESSBOARD = UMI_chessboard(frameworld, 0.3, (-0.05, -0.15), 0)
 
 #***************************************************************************
 
