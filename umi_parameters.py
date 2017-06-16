@@ -27,7 +27,6 @@ class UMI_parameters:
 
         # Joint-ranges in meters (where applicable e.g. Riser, Gripper) and in degrees for the rest.
 
-        ## TODO for students: REPLACE MINIMUM_DEGREES AND MAXIMUM_DEGREES FOR EACH INDIVIDUAL JOINT, THEY ARE NOT THE SAME FOR
         # SHOULDER, ELBOW, AND WRIST
         self.joint_ranges = {
             "Riser"     : [0.0, 0.925],
