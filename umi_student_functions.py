@@ -60,13 +60,14 @@ def board_position_to_cartesian(chessboard, position):
     (row, column) = to_coordinate(position)
     (x, _, z) = chessboard.get_position()
 
-    x_dim = math.cos(chessboard.get_angle_radians()) * (chessboard.chessboard_size-chessboard.field_size * row) + \
-        math.sin(chessboard.get_angle_radians()) * (chessboard.chessboard_size - chessboard.field_size * column)
+    row_len = chessboard.chessboard_size - chessboard.field_size * row
+    column_len = chessboard.chessboard_size - chessboard.field_size * column
+    total_len = sqrt(row_len*row_len + column_len*column_len)
 
-    z_dim = math.sin(chessboard.get_angle_radians()) * (chessboard.chessboard_size - chessboard.field_size * column) + \
-        math.cos(chessboard.get_angle_radians()) * (chessboard.chessboard_size - chessboard.field_size * row)
+    ang = -chessboard.get_angle_radians() + math.atan2(row_len, column_len)
 
-
+    x_dim = total_len * math.sin(ang)
+    z_dim = total_len * math.cos(ang)
 
     world_x = x + x_dim
     world_y = chessboard.mplhght
@@ -74,7 +75,8 @@ def board_position_to_cartesian(chessboard, position):
     # h8 is closes to the rotation point, row a[1-8] is furthest away from the robot arm.
 
     print(row, column)
-    print(world_x, world_z)
+    print(chessboard.get_angle_degrees(), degrees(math.atan2(row_len, column_len)))
+    print(world_x, world_y, world_z)
     print()
 
     return world_x, world_y, world_z
