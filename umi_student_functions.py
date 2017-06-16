@@ -37,6 +37,8 @@ def apply_inverse_kinematics(x, y, z, gripper):
                                 UMI.upper_length + UMI.lower_length * c))
     wrist_angle = -(elbow_angle + shoulder_angle)
 
+    print(x, y, z)
+    print(shoulder_angle, elbow_angle)
     print()
     print(x, z)
 
@@ -86,10 +88,10 @@ def high_path(chessboard, from_pos, to_pos):
 
     # Define half_piece height (you want to grab the middle of a piece, so get the height of the piece on a position.)
     # (*cough* this data might be stored in a chessboard *cough*)
-    piece = chessboard.pieces[from_pos][0]
-
+    piece_name = chessboard.pieces[from_pos][1]
+    piece_height = chessboard.pieces_height[piece_name]
     # You might need if statements around this, but you have to fill this variable regardlessly.
-    half_piece_height = 0.5*piece.height # ????
+    half_piece_height = 0.5*piece_height+chessboard.mplhght # ????
 
     # Get the coordinates.
     (from_x, from_y, from_z) = board_position_to_cartesian(chessboard, from_pos)
@@ -102,21 +104,24 @@ def high_path(chessboard, from_pos, to_pos):
     sequence_list.append(apply_inverse_kinematics(from_x, low_height, from_z, chessboard.field_size))
     # Hover above the first field on half of the piece height:
     sequence_list.append(apply_inverse_kinematics(from_x, half_piece_height, from_z, chessboard.field_size))
-
+    # make the gripper fit the piece:
+    sequence_list.append(apply_inverse_kinematics(from_x, half_piece_height, from_z, 0.01))
 
     ################################################ unfinished ###############
     # Give instruction to GUI to pickup piece
     sequence_list.append(["GUI", "TAKE", from_pos])
     # Hover above the first field on SAFE height (Keep the gripper closed!!):
-    sequence_list.append(apply_inverse_kinematics(from_x, safe_height, from_z, 0.5*piece.height))
+    sequence_list.append(apply_inverse_kinematics(from_x, safe_height, from_z, 0.01))
     # Move to new position on SAFE height
-    sequence_list.append(apply_inverse_kinematics(to_x, safe_height, to_z, 0.5*piece.height))
+    sequence_list.append(apply_inverse_kinematics(to_x, safe_height, to_z, 0.01))
     # Hover above the first field on LOW height:
-    sequence_list.append(apply_inverse_kinematics(to_x, low_height, to_z, 0.5*piece.height))
+    sequence_list.append(apply_inverse_kinematics(to_x, low_height, to_z, 0.01))
     # Hover above the first field on half of the piece height:
-    sequence_list.append(apply_inverse_kinematics(to_x, half_piece_height, to_z, 0.5*piece.height))
+    sequence_list.append(apply_inverse_kinematics(to_x, half_piece_height, to_z, 0.01))
     # Give instruction to GUI to drop piece
     sequence_list.append(["GUI", "DROP", to_pos])
+    # open the gripper
+    sequence_list.append(apply_inverse_kinematics(to_x, half_piece_height, to_z, chessboard.field_size))
     # Move to new position on SAFE height (And open the gripper)
     sequence_list.append(apply_inverse_kinematics(to_x, safe_height, to_z, chessboard.field_size))
     return sequence_list
@@ -137,11 +142,10 @@ def move_to_garbage(chessboard, from_pos):
     drop_location = "j5"
 
     # Define half_piece height (you want to grab the middle of a piece, so get the height of the piece on a position.)
-    piece = chessboard.pieces[from_pos][0]
-
+    piece_name = chessboard.pieces[from_pos][1]
+    piece_height = chessboard.pieces_height[piece_name]
     # You might need if statements around this, but you have to fill this variable regardlessly.
-    half_piece_height = 0.5*piece.height # ????
-
+    half_piece_height = 0.5*piece_height # ????
     # Get the coordinates.
     (from_x, from_y, from_z) = board_position_to_cartesian(chessboard, from_pos)
     (to_x, to_y, to_z) = board_position_to_cartesian(chessboard, drop_location)
@@ -157,13 +161,13 @@ def move_to_garbage(chessboard, from_pos):
     # Give instruction to GUI to pickup piece
     sequence_list.append(["GUI", "TAKE", from_pos])
     # Hover above the first field on SAFE height (Keep the gripper closed!!):
-    sequence_list.append(apply_inverse_kinematics(from_x, safe_height, from_z, 0.5*piece.height))
+    sequence_list.append(apply_inverse_kinematics(from_x, safe_height, from_z, 0.5*half_piece_height))
     # Move to new position on SAFE height
-    sequence_list.append(apply_inverse_kinematics(to_x, safe_height, to_z, 0.5*piece.height))
+    sequence_list.append(apply_inverse_kinematics(to_x, safe_height, to_z, 0.5*half_piece_height))
     # Hover above the first field on LOW height:
-    sequence_list.append(apply_inverse_kinematics(to_x, low_height, to_z, 0.5*piece.height))
+    sequence_list.append(apply_inverse_kinematics(to_x, low_height, to_z, 0.5*half_piece_height))
     # Hover above the first field on half of the piece height:
-    sequence_list.append(apply_inverse_kinematics(to_x, half_piece_height, to_z, 0.5*piece.height))
+    sequence_list.append(apply_inverse_kinematics(to_x, half_piece_height, to_z, 0.5*half_piece_height))
     # Give instruction to GUI to drop piece
     sequence_list.append(["GUI", "DROP", drop_location])
     # Move to new position on SAFE height (And open the gripper)
